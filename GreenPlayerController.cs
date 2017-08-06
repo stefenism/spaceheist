@@ -26,7 +26,12 @@ public class GreenPlayerController : PlayerControllerBase {
 
 
     void Update () {
-        float joymot = Input.GetAxis("HorizontalGreen");
+
+      float joymot = Input.GetAxis("HorizontalGreen");
+      
+      if(!cantMove)
+      {
+
         if (Input.GetAxis("HorizontalGreen") == 0)
             rb.AddForce(-brakeInfluence * Vector2.Dot(rb.velocity, transform.right) * transform.right, ForceMode2D.Force);
         else if (Mathf.Abs(Vector2.Dot(rb.velocity, transform.right)) < maxHorizotalVelocity)
@@ -35,6 +40,8 @@ public class GreenPlayerController : PlayerControllerBase {
             rb.AddForce(jumpForce * transform.up, ForceMode2D.Impulse);
             source.PlayOneShot(GreenJump);
           }
+      }
+
 
         Physics2D.IgnoreLayerCollision(12, 8);
 

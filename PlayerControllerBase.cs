@@ -25,6 +25,7 @@ public class PlayerControllerBase : MonoBehaviour {
 	public bool carrying = false;
 	public bool beingCarried = false;
 	public float throwForce;
+	public bool cantMove = false;
 
 	public bool facingRight = true;
 
@@ -134,7 +135,8 @@ public class PlayerControllerBase : MonoBehaviour {
 
 
 		Vector2 throwDirection = (throwPosition.position - transform.position).normalized;
-
+		carryObjectController.cantMove = true;
+		carryObjectController.Invoke("CannotMove", throwTime);
 		carryObjectRB.AddForce(throwDirection * throwForce, ForceMode2D.Impulse);
 
 		carryObjectController.beenThrown = true;
@@ -208,6 +210,11 @@ public class PlayerControllerBase : MonoBehaviour {
 	{
 		youDed = false;
 		transform.position = spawnPoint.position;
+	}
+
+	public void CannotMove()
+	{
+		cantMove = false;
 	}
 
 	void OnCollisionEnter2D(Collision2D collider)

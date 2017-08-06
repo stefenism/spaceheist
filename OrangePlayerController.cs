@@ -65,14 +65,14 @@ public class OrangePlayerController : PlayerControllerBase {
 
 	void FixedUpdate()
 	{
-		if(canRun)
+		if(canRun && !cantMove)
 		{
             rb.velocity = speed * moveDir * transform.right + Vector2.Dot(rb.velocity, transform.up) * transform.up;
     }
 
-		else
+		else if(!cantMove)
 		{
-			  rb.velocity = (speed * .75f) * moveDir * transform.right + Vector2.Dot(rb.velocity, transform.up) * transform.up;
+			  rb.AddForce(speed * moveDir * transform.right + Vector2.Dot(rb.velocity, transform.up) * transform.up);//) = (speed * .75f) * moveDir * transform.right + Vector2.Dot(rb.velocity, transform.up) * transform.up;
 		}
 
 
