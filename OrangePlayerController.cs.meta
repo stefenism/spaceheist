@@ -1,10 +1,19 @@
 fileFormatVersion: 2
 guid: 042cfe1f9c15e7d4fbb0dd67250494e3
-timeCreated: 1501945545
+timeCreated: 1501985310
 licenseType: Free
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - rb: {instanceID: 0}
+  - carryObject: {instanceID: 0}
+  - carryObjectController: {instanceID: 0}
+  - carryObjectRB: {instanceID: 0}
+  - carryPosition: {instanceID: 0}
+  - dropPosition: {instanceID: 0}
+  - throwPosition: {instanceID: 0}
+  - OrangeJump: {fileID: 8300000, guid: 476bdeac49eb3ba40b4333f06c2aab1e, type: 3}
+  - OrangeThrow: {fileID: 8300000, guid: 4032eaa36e2ad7740ac9fc3ca26af32e, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

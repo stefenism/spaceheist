@@ -19,26 +19,62 @@ public class OrangePlayerController : PlayerControllerBase {
 	public float jumpTime;
 	public float jumpDuration;
 
+	private Animator anim;
+
+	//private AudioSource source;
+	public AudioClip OrangeJump;
+	public AudioClip OrangeThrow;
+	private float Vollow = 0.5f;
+	private float VolHigh = 1.0f;
+
 
 	// Use this for initialization
 	void Awake () {
 		rb = GetComponent<Rigidbody2D>();
+		source = GetComponent<AudioSource>();
+		anim = transform.GetChild(0).transform.GetChild(0).GetComponent<Animator>();
 	}
 
 	// Update is called once per frame
 	void Update () {
 
-		CheckInput();
+		if(!youDed || !beenThrown)
+		{
+			CheckInput();
+		}
+
+		/*
+		if(beenThrown)
+		{
+			BeingThrown();
+		}
+		*/
+
 
 		Physics2D.IgnoreLayerCollision(9,10);
+
+		if(moveDir > 0 && !facingRight)
+		{
+			Flip();
+		}
+		else if(moveDir <0 && facingRight)
+		{
+			Flip();
+		}
 	}
 
 	void FixedUpdate()
 	{
 		if(canRun)
 		{
-			rb.velocity = new Vector2(speed * moveDir, rb.velocity.y);//.right * speed * moveDir;
+            rb.velocity = speed * moveDir * transform.right + Vector2.Dot(rb.velocity, transform.up) * transform.up;
+    }
+
+		else
+		{
+			  rb.velocity = (speed * .75f) * moveDir * transform.right + Vector2.Dot(rb.velocity, transform.up) * transform.up;
 		}
+
 
 		if(jumpAllowed)
 		{
@@ -60,12 +96,41 @@ public class OrangePlayerController : PlayerControllerBase {
 				Drop();
 			}
 
+			if(Input.GetButtonDown("Throw") && !beingCarried)
+			{
+				Throw();
+				source.PlayOneShot(OrangeThrow);
+			}
+
 		}
 	}
 
 	void CheckInput()
 	{
-		moveDir = Input.GetAxis("Horizontal");
+		if(!beingCarried)
+		{
+			moveDir = Input.GetAxis("Horizontal");
+			Debug.Log("moveDir: " + moveDir);
+		}
+
+		if(beingCarried)
+		{
+			if(Input.GetButtonDown("Jump"))
+			{
+				if(transform.parent != null)
+				{
+					transform.parent = null;
+				}
+				beingCarried = false;
+				GetComponent<BoxCollider2D>().enabled = true;
+				rb.isKinematic = false;
+
+				jumpAllowed = true;
+				canJump = true;
+			}
+		}
+
+
 
 		if(grounded)
 		{
@@ -79,9 +144,15 @@ public class OrangePlayerController : PlayerControllerBase {
 		else
 		{
 			canJump = false;
+			canRun = false;
 		}
 
 		JumpButton();
+
+		anim.SetFloat("speed", Mathf.Abs(rb.velocity.x));
+		anim.SetFloat("vspeed", Mathf.Abs(rb.velocity.y));
+		anim.SetBool("grounded",grounded);
+
 	}
 
 	void JumpButton()
@@ -117,11 +188,16 @@ public class OrangePlayerController : PlayerControllerBase {
 	void Jump()
 	{
 
+		if (Input.GetButtonDown("Jump"))
+		{
+				source.PlayOneShot(OrangeJump);
+		}
+
 		if(jumping)
 		{
 			if(jumpDuration < jumpTime)
 			{
-				rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+                rb.velocity = Vector2.Dot(rb.velocity, transform.right) * transform.right + jumpForce * transform.up;
 			}
 		}
 	}
@@ -130,11 +206,12 @@ public class OrangePlayerController : PlayerControllerBase {
 	{
 		canCarry = true;
 		carryObject = collided.gameObject;
+		carryObject.transform.localScale = transform.localScale;
 		carryObjectController = carryObject.GetComponent(typeof(PlayerControllerBase)) as PlayerControllerBase;
 		carryObjectRB = carryObject.GetComponent<Rigidbody2D>();
 	}
 
-	public void SetDropValues(GameObject collided)
+	public void SetDropValues()
 	{
 		canCarry = false;
 		carryObject = null;

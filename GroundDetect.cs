@@ -23,22 +23,44 @@ public class GroundDetect : MonoBehaviour {
 
   void GroundDetection()
   {
-    RaycastHit2D hit = Physics2D.Raycast(transform.position, -Vector2.up, groundDistance, groundLayer);
+    Vector3 hit2transform = new Vector3(transform.position.x + .15f, transform.position.y, 0);
+    Vector3 hit3transform = new Vector3(transform.position.x - .15f, transform.position.y, 0);
 
-    Debug.DrawRay(transform.position, -Vector2.up * groundDistance);
+    RaycastHit2D hit = Physics2D.Raycast(transform.position, Physics2D.gravity.normalized, groundDistance, groundLayer);
+    RaycastHit2D hit2 = Physics2D.Raycast(hit2transform, Physics2D.gravity.normalized, groundDistance, groundLayer);
+    RaycastHit2D hit3 = Physics2D.Raycast(hit3transform, Physics2D.gravity.normalized, groundDistance, groundLayer);
 
-    if(hit.collider != null)
+    Debug.DrawRay(transform.position, Physics2D.gravity.normalized * groundDistance);
+    Debug.DrawRay(hit2transform, Physics2D.gravity.normalized * groundDistance);
+    Debug.DrawRay(hit3transform, Physics2D.gravity.normalized * groundDistance);
+
+    if(hit.collider != null || hit2.collider != null || hit3.collider != null)
     {
+      player.grounded = true;
 
-      if(hit.collider.gameObject.tag == "Ground" && (player.rb.velocity.y > 5))
+      if (hit.collider != null)
       {
-        player.grounded = false;
+        if(groundLayer == (groundLayer | (1 << hit.collider.gameObject.layer)) && (Vector2.Dot(player.rb.velocity, -Physics2D.gravity.normalized) > 5f))
+        {
+          player.grounded = false;
+        }
       }
 
-      else
+      if(hit2.collider != null)
       {
-        player.grounded = true;
+        if(groundLayer == (groundLayer | (1 << hit2.collider.gameObject.layer)) && (Vector2.Dot(player.rb.velocity, -Physics2D.gravity.normalized) > 5f))
+        {
+          player.grounded = false;
+        }
       }
+
+      if(hit3.collider != null)
+      {
+        if(groundLayer == (groundLayer | (1 << hit3.collider.gameObject.layer)) && (Vector2.Dot(player.rb.velocity, -Physics2D.gravity.normalized) > 5f))
+        {
+          player.grounded = false;
+        }
+      } 
     }
 
     else

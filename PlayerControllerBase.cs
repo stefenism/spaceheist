@@ -14,11 +14,23 @@ public class PlayerControllerBase : MonoBehaviour {
 	public GameObject carryObject;
 	public PlayerControllerBase carryObjectController;
 	public Rigidbody2D carryObjectRB;
+    public AudioClip Death;
 
 	public Transform carryPosition;
 	public Transform dropPosition;
+	public Transform throwPosition;
+	public float throwDuration;
+	public float throwTime;
+	public bool beenThrown = false;
 	public bool carrying = false;
 	public bool beingCarried = false;
+	public float throwForce;
+
+	public bool facingRight = true;
+
+	public Transform spawnPoint;
+	public bool youDed = false;
+  public AudioSource source;
 /*
 	[HideInInspector]
 	[Header("Run Stuff")]
@@ -38,6 +50,7 @@ public class PlayerControllerBase : MonoBehaviour {
 	// Use this for initialization
 	void Awake () {
 		rb = GetComponent<Rigidbody2D>();
+      //source = GetComponent<AudioSource>();
 	}
 
 	// Update is called once per frame
@@ -52,7 +65,16 @@ public class PlayerControllerBase : MonoBehaviour {
 			Drop();
 		}
 
+		/*
+		if(beenThrown)
+		{
+			BeingThrown();
+		}
+		*/
+
 		Debug.Log("cancarry: " + canCarry);
+
+
 	}
 
 	public void Carry()
@@ -94,6 +116,55 @@ public class PlayerControllerBase : MonoBehaviour {
 		carryObjectController = null;
 	}
 
+	public void Throw()
+	{
+		if(carryObjectController != null)
+		{
+			if(carryObjectController.transform.parent != null)
+			{
+				carryObjectController.setThisParent(null);
+			}
+		}
+
+
+		carryObjectController.beingCarried = false;
+		carryObject.GetComponent<BoxCollider2D>().enabled = true;
+		carryObjectRB.isKinematic = false;
+		Invoke("setCarrying", .1f);
+
+
+		Vector2 throwDirection = (throwPosition.position - transform.position).normalized;
+
+		carryObjectRB.AddForce(throwDirection * throwForce, ForceMode2D.Impulse);
+
+		carryObjectController.beenThrown = true;
+		//canCarry = false;
+		carryObject = null;
+		carryObjectRB = null;
+		carryObjectController = null;
+	}
+
+	/*
+	public void BeingThrown()
+	{
+		Vector2 throwDirection = (this.throwPosition.position - this.transform.position).normalized;
+
+
+		if(throwDuration > throwTime)
+		{
+			beenThrown = false;
+			return;
+		}
+
+		else
+		{
+			throwDuration += Time.deltaTime;
+
+			carryObjectRB.AddForce(throwDirection * throwForce);
+		}
+	}
+	*/
+
 	void setCarrying()
 	{
 		carrying = !carrying;
@@ -118,11 +189,36 @@ public class PlayerControllerBase : MonoBehaviour {
 		carryObjectController = carryObject.GetComponent(typeof(PlayerControllerBase)) as PlayerControllerBase;
 		carryObjectRB = carryObject.GetComponent<Rigidbody2D>();
 	}
-	public void SetDropValues(GameObject collided){
+	public void SetDropValues(){
 
 		carryObject = null;
 	}
 
+	public void Flip()
+	{
+		facingRight = !facingRight;
+
+		Vector3 theScale = transform.localScale;
+		theScale.x *= -1;
+		transform.localScale = theScale;
+
+	}
+
+	void ded()
+	{
+		youDed = false;
+		transform.position = spawnPoint.position;
+	}
+
+	void OnCollisionEnter2D(Collision2D collider)
+	{
+		if(collider.gameObject.tag == "Kill")
+		{
+			youDed = true;
+			Invoke("ded",3);
+      source.PlayOneShot(Death);
+		}
+	}
 	/*
 	void OnTriggerEnter2D(Collider2D collider)
 	{
