@@ -85,10 +85,17 @@ public class PlayerControllerBase : MonoBehaviour {
 		//carrying = true;
 		canCarry = false;
 		Debug.Log("carryObject: " + carryObject.name);
+		if(carryObject.transform.localScale.x != transform.localScale.x)
+		{
+			carryObjectController.Flip();
+		}
 		//carryObject.transform.parent = this.gameObject.transform;
 		//carryObject.transform.SetParent(this.gameObject.transform);
 		carryObjectController.setThisParent(this.gameObject.transform);
 		carryObject.transform.position = carryPosition.position;
+
+
+		//carryObject.transform.localScale = transform.localScale;
 		carryObjectController.beingCarried = true;
 		carryObject.GetComponent<BoxCollider2D>().enabled = false;//("false");
 		carryObjectRB.isKinematic = true;

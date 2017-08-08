@@ -8,15 +8,17 @@ public class Teleport : MonoBehaviour
 
     public AudioClip TeleportSFX;
     private AudioSource source;
+    public WipeTransition wipe;
 
 
-
-
-    // Use this for initialization
     void Start()
     {
-        source = GetComponent<AudioSource>();
 
+      source = GetComponent<AudioSource>();
+      if(GameObject.FindWithTag("wipe") != null)
+      {
+        wipe = GameObject.FindWithTag("wipe").GetComponent<WipeTransition>();
+      }
 
     }
 
@@ -28,7 +30,8 @@ public class Teleport : MonoBehaviour
 
     void OnTriggerEnter2D()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        wipe.activated = true;
         source.PlayOneShot(TeleportSFX);
     }
 }

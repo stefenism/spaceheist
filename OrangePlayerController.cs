@@ -110,7 +110,7 @@ public class OrangePlayerController : PlayerControllerBase {
 		if(!beingCarried)
 		{
 			moveDir = Input.GetAxis("Horizontal");
-			Debug.Log("moveDir: " + moveDir);
+			//Debug.Log("moveDir: " + moveDir);
 		}
 
 		if(beingCarried)
